@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Tickets</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🎫 Sistema de Chamados</h1>
+        
+        <form action="{{ url_for('criar_ticket') }}" method="POST">
+            <h3>Novo Chamado</h3>
+            <input type="text" name="solicitante" placeholder="Teu Nome" required>
+            <input type="text" name="assunto" placeholder="Assunto" required>
+            <textarea name="problema" placeholder="Descreve o problema" required></textarea>
+            <button type="submit" class="btn-primario">Abrir Ticket</button>
+        </form>
+
+        <hr>
+
+        <form method="GET" style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <input type="text" name="busca" placeholder="Pesquisar ticket...">
+            <select name="status">
+                <option value="todos">Todos os Status</option>
+                <option value="Aberto">Abertos</option>
+                <option value="Em Andamento">Em Andamento</option>
+                <option value="Fechado">Fechados</option>
+            </select>
+            <button type="submit" class="btn-primario">Filtrar</button>
+        </form>
+
+        <div class="grid-tickets">
+            {% for t in tickets %}
+            <div class="card">
+                <span class="badge {{ t.status.lower().replace(' ', '-') }}">{{ t.status }}</span>
+                <h3>{{ t.assunto }}</h3>
+                <p><strong>De:</strong> {{ t.solicitante }}</p>
+                <p><strong>Responsável:</strong> 
+                    {% if t.responsavel and t.responsavel != 'Não Atribuído' %}
+                        <span class="nome-responsavel">{{ t.responsavel }}</span>
+                    {% else %}
+                        <span class="vago">Aguardando Técnico...</span>
+                    {% endif %}
+                </p>
+                <a href="{{ url_for('detalhe_ticket', ticket_id=t.id_ticket) }}" class="btn-primario" style="font-size: 0.8em; margin-top: 10px; display: block; text-align: center;">Ver Detalhes</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

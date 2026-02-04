@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Ticket #{{ ticket.id_ticket }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header style="margin-bottom: 20px;">
+            <a href="{{ url_for('pagina_inicial') }}" style="text-decoration: none;">← Voltar à Lista</a>
+            <h1>Ticket #{{ ticket.id_ticket }}: {{ ticket.assunto }}</h1>
+        </header>
+
+        <div class="area-admin">
+            <h4>⚙️ Painel de Gestão</h4>
+            <form action="{{ url_for('atualizar_ticket', ticket_id=ticket.id_ticket) }}" method="POST" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
+                    <label>Status:</label>
+                    <select name="status">
+                        <option value="Aberto" {% if ticket.status == 'Aberto' %}selected{% endif %}>Aberto</option>
+                        <option value="Em Andamento" {% if ticket.status == 'Em Andamento' %}selected{% endif %}>Em Andamento</option>
+                        <option value="Fechado" {% if ticket.status == 'Fechado' %}selected{% endif %}>Fechado</option>
+                    </select>
+                </div>
+                <div style="flex: 2; min-width: 200px;">
+                    <label>Técnico Responsável:</label>
+                    <input type="text" name="responsavel" value="{{ ticket.responsavel if ticket.responsavel != 'Não Atribuído' else '' }}" placeholder="Introduz o teu nome para assumir">
+                </div>
+                <button type="submit" class="btn-primario" style="margin-top: 20px;">Atualizar Chamado</button>
+            </form>
+        </div>
+
+        <div class="card">
+            <p><strong>Solicitante:</strong> {{ ticket.solicitante }}</p>
+            <p><strong>Descrição:</strong> {{ ticket.problema }}</p>
+            <p><strong>Aberto em:</strong> {{ ticket.data_abertura }}</p>
+        </div>
+
+        <h3 style="margin-top: 30px;">💬 Histórico de Comentários</h3>
+        <div style="margin-bottom: 30px;">
+            {% for com in ticket.comentarios %}
+            <div class="comentario-item">
+                <p><strong>{{ com.autor }}</strong> <small style="color: #888;">({{ com.data }})</small></p>
+                <p>{{ com.texto }}</p>
+            </div>
+            {% else %}
+            <p>Ainda não existem comentários.</p>
+            {% endfor %}
+        </div>
+
+        <form action="{{ url_for('adicionar_comentario', ticket_id=ticket.id_ticket) }}" method="POST">
+            <h4>Adicionar Comentário</h4>
+            <input type="text" name="autor" placeholder="Teu nome" required>
+            <textarea name="texto" placeholder="Escreve aqui a tua atualização..." required></textarea>
+            <button type="submit" class="btn-primario">Enviar Comentário</button>
+        </form>
+
+        <hr>
+        <form action="{{ url_for('deletar_ticket', ticket_id=ticket.id_ticket) }}" method="POST" onsubmit="return confirm('Tens a certeza que desejas eliminar este ticket permanentemente?');">
+            <button type="submit" class="btn-deletar">Eliminar Ticket</button>
+        </form>
+    </div>
+</body>
+</html>
